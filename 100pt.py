@@ -32,12 +32,24 @@ class MyApp:
 		
 		self.up = Button(self.myContainer1)
 		self.up.configure(text="Up", background= "green")
-		self.up.grid(row=0,column=0)
-					
-		# "Bind" an action to the first button												
+		self.up.grid(row=0,column=0)											
 		self.up.bind("<Button-1>", self.moveUp)
+		
+                self.down = Button(self.myContainer1)
+		self.down.configure(text="Down", background= "green")
+		self.down.grid(row=0,column=1)												
+		self.down.bind("<Button-1>", self.moveDown)
                 
-		  
+                self.left = Button(self.myContainer1)
+		self.left.configure(text="Left", background= "green")
+		self.left.grid(row=0,column=2)												
+		self.left.bind("<Button-1>", self.moveLeft)
+		
+                self.right = Button(self.myContainer1)
+		self.right.configure(text="Right", background= "green")
+		self.right.grid(row=0,column=3)												
+		self.right.bind("<Button-1>", self.moveRight)
+		
 		# This creates the drawpad - no need to change this 
 		drawpad.pack()
 		self.animate()
@@ -45,10 +57,28 @@ class MyApp:
 		
 	def moveUp(self, event):   
 		global player
-		global drawpad
-                x1,y1,x2,y2 = drawpad.coords(player)
-		# Get the coords of our target
-                drawpad.move(player,0,-10)
+		x1,y1,x2,y2 = drawpad.coords(player)
+	        if y1 >= 0 and y2 <= drawpad.winfo_height():
+	           drawpad.move(player,0,-10)
+                
+        def moveDown(self, event):   
+		global player
+		x1,y1,x2,y2 = drawpad.coords(player)
+	        if y1 >= 0 and y2 <= drawpad.winfo_height():
+	           drawpad.move(player,0,10)
+                
+        def moveLeft(self, event):   
+		global player
+		x1,y1,x2,y2 = drawpad.coords(player)
+	        if x1 >= 0 and x2 <= drawpad.winfo_width():
+	           drawpad.move(player,-10,0)
+                
+        def moveRight(self, event):   
+	    global player
+	    x1,y1,x2,y2 = drawpad.coords(player)
+	    if x1 >= 0 and x2 <= drawpad.winfo_width():
+	        drawpad.move(player,10,0)
+                
     
          
         # Animate function that will bounce target left and right, and trigger the collision detection  
@@ -58,15 +88,20 @@ class MyApp:
 	    tx1,ty1,tx2,ty2 = drawpad.coords(target)
 	    
 	    # Insert the code here to make the target move, bouncing on the edges    
-	        
-	        
-            
-            
+            if tx1 <= 0:
+                direction = 10
+            elif tx2 >= drawpad.winfo_width():
+                direction = -10               
+            drawpad.move(target,direction,0)
+
             #  This will trigger our collision detect function
             didWeHit = self.collisionDetect()
             # Use the value of didWeHit to create an if statement
             # that determines whether to run drawpad.after(1,self.animate) or not
-            
+            if didWeHit == False:
+                drawpad.after(1,self.animate)
+            else:
+                pass
 	# Use a function to do our collision detection
 	def collisionDetect(self):
                 global target
@@ -74,9 +109,13 @@ class MyApp:
                 global player
                 # Get the co-ordinates of our player AND our target
                 # using x1,y1,x2,y2 = drawpad.coords(object)
-
+                x1,y1,x2,y2 = drawpad.coords(player)
+                tx1,ty1,tx2,ty2 = drawpad.coords(target)
                 # Do your if statement - remember to return True if successful!                
-		
+	        if x1 > tx1 and x2 < tx2 and y1 > ty1 and y2 < ty2:
+	            return True
+	        else:
+	            return False
 myapp = MyApp(root)
 
 root.mainloop()
